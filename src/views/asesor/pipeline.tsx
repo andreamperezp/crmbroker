@@ -40,7 +40,7 @@ export function Pipeline() {
         title="Pipeline de leads"
         subtitle={`${abiertas.length} oportunidades abiertas · ${fmtPesos(abiertas.reduce((t, l) => t + l.prima, 0))} en primas mensuales`}
       >
-        <label className="flex items-center gap-2 text-[13px] font-semibold text-muted">
+        <label className="flex items-center gap-2 text-[13px] font-semibold whitespace-nowrap text-muted">
           Cartera de
           <select className={cx(inputClass, "h-10 w-auto py-0")} value={s.asesorActual} onChange={(e) => dispatch({ t: "asesor/elegir", id: e.target.value })}>
             {s.asesores.map((a) => (
