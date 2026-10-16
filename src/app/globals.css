@@ -1,69 +1,75 @@
 @import "tailwindcss";
 
 /*
- * Design tokens de Brokerflow.
- * Tinta verde azulada profunda sobre un blanco cálido, con un acento "flow" turquesa.
- * Los estados de cobranza tienen su color: al día (verde), mora temprana (ámbar), mora tardía (terracota).
- * Contrastes AA: texto normal ≥ 4.5:1 sobre --bg y --surface.
+ * Design system de Brokerflow 1.0 · "Claro, cercano y confiable".
+ * Una sola paleta para los cuatro perfiles: el índigo transmite confianza; los colores
+ * de estado se reservan para el dinero y los plazos.
+ *   Verde  · al día, cobrado, aprobado
+ *   Ámbar  · por vencer y mora temprana (atención sin alarma)
+ *   Coral  · mora tardía, vencido, riesgo de anulación (con moderación)
+ *   Teal   · procesos en curso: endosos, siniestros, inspecciones
+ * Radios: 10 controles · 14–18 tarjetas · 999 chips. Espaciado 4 · 8 · 12 · 16 · 24 · 32.
  */
 :root {
-  --bg: #f3f5f2;
+  --bg: #f5f6fa;
   --surface: #ffffff;
-  --surface-2: #e8eee9;
-  --ink: #0e2a33;
-  --muted: #4c626a;
-  --line: #d6dfd9;
-  --primary: #0f5c5a;
-  --primary-hover: #0b4a48;
-  --on-primary: #f3f5f2;
-  --flow: #2fa58f;
-  --flow-soft: #d7efe8;
-  --on-flow-soft: #0d4a40;
-  --ok: #2b7a57;
-  --ok-soft: #dcefe3;
-  --warn: #9a6212;
-  --warn-soft: #fbeed3;
-  --danger: #a93f2c;
-  --danger-soft: #f7ddd5;
-  --info: #335f96;
-  --info-soft: #dfe9f6;
-
-  /* Un color por perfil, para que la demo se lea de un vistazo */
-  --rol-cliente: #6a58a6;
-  --rol-asesor: #0f7a6e;
-  --rol-admin: #335f96;
-  --rol-cobranzas: #9a6212;
-
+  --segment: #f0f1f7;
+  --line: #e3e6ef;
+  --line-soft: #eef0f5;
+  --input: #d9dde8;
+  --ink: #151a3d;
+  --ink-2: #3a4061;
+  --muted: #565c7a;
+  --faint: #8a90ab;
+  --primary: #4b55d6;
+  --primary-hover: #3d46be;
+  --primary-soft: #eceefc;
+  --primary-light: #a9b0ff;
+  --ok: #178a5e;
+  --ok-soft: #e3f5ec;
+  --on-ok: #137a52;
+  --warn: #e39a1f;
+  --warn-soft: #fdf1dc;
+  --on-warn: #9a5b00;
+  --danger: #d24452;
+  --danger-soft: #fbe7e9;
+  --on-danger: #b42f3b;
+  --info: #0b7f95;
+  --info-soft: #e0f3f6;
+  --on-info: #0a6f82;
+  --logo-blue: #1f6ff2;
   color-scheme: light;
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
-  --color-surface-2: var(--surface-2);
-  --color-ink: var(--ink);
-  --color-muted: var(--muted);
+  --color-segment: var(--segment);
   --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-input: var(--input);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
-  --color-on-primary: var(--on-primary);
-  --color-flow: var(--flow);
-  --color-flow-soft: var(--flow-soft);
-  --color-on-flow-soft: var(--on-flow-soft);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-light: var(--primary-light);
   --color-ok: var(--ok);
   --color-ok-soft: var(--ok-soft);
+  --color-on-ok: var(--on-ok);
   --color-warn: var(--warn);
   --color-warn-soft: var(--warn-soft);
+  --color-on-warn: var(--on-warn);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
+  --color-on-danger: var(--on-danger);
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
-  --color-rol-cliente: var(--rol-cliente);
-  --color-rol-asesor: var(--rol-asesor);
-  --color-rol-admin: var(--rol-admin);
-  --color-rol-cobranzas: var(--rol-cobranzas);
-  --font-sans: var(--font-instrument), system-ui, sans-serif;
-  --font-display: var(--font-bricolage), var(--font-instrument), system-ui, sans-serif;
+  --color-on-info: var(--on-info);
+  --color-logo-blue: var(--logo-blue);
+  --font-sans: var(--font-figtree), system-ui, sans-serif;
 }
 
 html {
@@ -79,8 +85,34 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--flow);
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+/* Íconos Material Symbols Rounded (se cargan desde Google Fonts en el layout) */
+.icon {
+  font-family: "Material Symbols Rounded";
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-feature-settings: "liga";
+  font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  flex: none;
+}
+.icon-fill {
+  font-variation-settings: "FILL" 1;
+}
+
+/* El logo es un PNG sobre fondo casi blanco: así se integra con cualquier fondo claro */
+.logo-blend {
+  mix-blend-mode: multiply;
 }
 
 @keyframes toast-in {

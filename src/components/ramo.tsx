@@ -1,15 +1,23 @@
-import { IconBuildingStore, IconCar, IconHeartHandshake, IconHome, IconUmbrella } from "@tabler/icons-react";
-import type { Ramo } from "@/lib/types";
+import { IconTile, type Tone } from "./ui";
+import type { Ramo, TipoGestion } from "@/lib/types";
 
-export const ICONO_RAMO: Record<Ramo, typeof IconCar> = {
-  Auto: IconCar,
-  Hogar: IconHome,
-  Vida: IconHeartHandshake,
-  Comercio: IconBuildingStore,
-  "Accidentes personales": IconUmbrella,
+/** Ícono Material Symbols de cada ramo (según el design system) */
+export const ICONO_RAMO: Record<Ramo, string> = {
+  Auto: "directions_car",
+  Hogar: "home",
+  Vida: "favorite",
+  Comercio: "storefront",
+  "Accidentes personales": "health_and_safety",
 };
 
-export function RamoIcon({ ramo, size = 18 }: { ramo: Ramo; size?: number }) {
-  const Icono = ICONO_RAMO[ramo];
-  return <Icono size={size} aria-hidden="true" />;
+export const ICONO_GESTION: Record<TipoGestion, string> = {
+  Emisión: "post_add",
+  Endoso: "edit_document",
+  Siniestro: "car_crash",
+  Renovación: "autorenew",
+  Baja: "cancel",
+};
+
+export function RamoTile({ ramo, size = 40, tone = "primary" }: { ramo: Ramo; size?: number; tone?: Tone }) {
+  return <IconTile name={ICONO_RAMO[ramo]} size={size} tone={tone} />;
 }

@@ -4,9 +4,10 @@
  * personas, comercios, patentes, aseguradoras y teléfonos.
  */
 import { addDays, addMonths } from "./format";
-import type { Cliente, Cuota, Estado, Gestion, Lead, Poliza, Prospecto, Ramo, Tarea } from "./types";
+import { CHECKLIST, type Cliente, type Cuota, type Documento, type Estado, type Gestion, type Lead, type Mensaje, type Poliza, type Prospecto, type Ramo, type Tarea } from "./types";
 
-export const ASEGURADORAS = ["Ceibo Seguros", "Alerce Seguros", "Faro Seguros", "Brisa Seguros"];
+/** Aseguradoras ficticias: en una demo pública no usamos nombres de compañías reales. */
+export const ASEGURADORAS = ["Ceibo Seguros", "Alerce Seguros", "Faro Seguros", "Brisa Seguros", "Tala Seguros"];
 
 type Situacion = "al día" | "temprana" | "temprana-marcada" | "tardia" | "tardia-marcada";
 
@@ -203,15 +204,21 @@ export function seed(hoy: string): Estado {
     creada: addDays(hoy, -creadaHace),
     vence: addDays(hoy, venceEn),
     historial: [{ fecha: addDays(hoy, -creadaHace), texto: "Trámite iniciado" }],
+    checks: CHECKLIST[tipo].map((_, k) => k < paso + 1),
     ...extra,
   });
 
   const gestiones: Gestion[] = [
     gestion("g1", "Emisión", "c21", "Auto", "Volkswagen Polo 2022 · Ceibo Seguros · todo riesgo con franquicia", 1, 2, 2, { leadId: "l9" }),
-    gestion("g2", "Siniestro", "c6", "Auto", "Choque trasero en Av. 7 y 50. Sin lesionados. Falta presupuesto del taller.", 1, 3, 3, { polizaId: "p7" }),
+    gestion("g2", "Siniestro", "c6", "Auto", "Choque trasero en Av. 7 y 50. Sin lesionados.", 1, 3, 3, {
+      polizaId: "p7",
+      responsable: "Julián Sosa",
+      monto: 1_850_000,
+      relato: "Estaba frenado en el semáforo de Av. 7 y 50 y un auto me chocó de atrás. El otro conductor reconoció la culpa y me pasó sus datos. Se rompió el paragolpes y una óptica.",
+    }),
     gestion("g3", "Endoso", "c12", "Auto", "Cambio de patente por vehículo nuevo", 0, 4, -1, { polizaId: "p14" }),
     gestion("g4", "Renovación", "c5", "Hogar", "La póliza vence pronto: cotizar renovación con ajuste de suma asegurada", 0, 1, 5, { polizaId: "p6" }),
-    gestion("g5", "Endoso", "c8", "Comercio", "Agregar cobertura de cristales a la vidriera", 1, 2, 4, { polizaId: "p10" }),
+    gestion("g5", "Endoso", "c8", "Comercio", "Agregar cobertura de cristales a la vidriera", 1, 2, 4, { polizaId: "p10", responsable: "Julián Sosa" }),
     gestion("g6", "Baja", "c9", "Vida", "Pide la baja por cambio de trabajo: ofrecer alternativa antes de confirmar", 0, 0, 3, { polizaId: "p11" }),
   ];
 
@@ -251,7 +258,11 @@ export function seed(hoy: string): Estado {
     tareas,
     prospectos: [],
     eventos: [],
+    mensajes: mensajes(hoy),
+    planes: [],
+    documentos: documentos(hoy, polizas),
     clienteActual: "c1",
+    movil: false,
     seq: 100,
   };
 }
@@ -271,3 +282,28 @@ export const PROSPECTOS_POOL: Omit<Prospecto, "id" | "estado">[] = [
   { nombre: "Florencia Ibarra", ciudad: "Berisso", ramo: "Accidentes personales", bien: "Trabajo independiente", senal: "Se registró como profesional independiente", fuente: "Padrón público de profesionales", afinidad: 68, telefono: "221 630-4459", email: "florencia.ibarra@ejemplo.com" },
   { nombre: "Verónica Lagos", ciudad: "City Bell", ramo: "Accidentes personales", bien: "Coordinadora de viajes grupales", senal: "Organiza viajes grupales según su sitio web", fuente: "Sitio web propio", afinidad: 64, telefono: "221 498-7316", email: "veronica.lagos@ejemplo.com" },
 ];
+
+function mensajes(hoy: string): Mensaje[] {
+  const m = (id: string, clienteId: string, de: Mensaje["de"], texto: string, dias: number, hora: string): Mensaje => ({ id, clienteId, de, texto, fecha: addDays(hoy, dias), hora });
+  return [
+    m("m1", "c10", "cobranzas", "Hola Federico, te escribimos de Brokerflow: tu seguro de hogar tiene dos cuotas pendientes. ¿Te podemos ayudar?", -12, "10:15"),
+    m("m2", "c10", "cobranzas", "Federico, seguimos sin registrar el pago. Si te conviene, podemos armar un plan en cuotas.", -4, "11:02"),
+    m("m3", "c2", "cobranzas", "Hola Hernán, te recordamos que la cuota de tu auto está vencida.", -6, "09:40"),
+    m("m4", "c2", "cliente", "Hola, sí, se me pasó. La pago esta semana.", -6, "13:18"),
+    m("m5", "c7", "cobranzas", "Hola Valentina, ¿pudiste ver lo de la cuota de tu Cronos?", -1, "16:05"),
+    m("m6", "c7", "cliente", "Sí, el viernes cobro y transfiero.", -1, "16:22"),
+    m("m7", "c1", "asesor", "¡Hola Lucía! Cualquier consulta sobre tus pólizas, escribime por acá.", -40, "12:00"),
+  ];
+}
+
+function documentos(hoy: string, polizas: Poliza[]): Documento[] {
+  const docs: Documento[] = [];
+  polizas.forEach((p, i) => {
+    docs.push({ id: `d${i}a`, clienteId: p.clienteId, nombre: `Póliza ${p.numero} · ${p.ramo}`, tipo: "Póliza", fecha: p.desde });
+    docs.push({ id: `d${i}b`, clienteId: p.clienteId, nombre: `Certificado de cobertura · ${p.ramo}`, tipo: "Certificado", fecha: p.desde });
+    if (p.ramo === "Auto") docs.push({ id: `d${i}c`, clienteId: p.clienteId, nombre: `Cédula verde · ${p.bien.split("·")[1]?.trim() ?? p.bien}`, tipo: "Cédula", fecha: p.desde });
+  });
+  docs.push({ id: "d-s1", clienteId: "c6", nombre: "Denuncia de siniestro · choque en Av. 7", tipo: "Denuncia", fecha: addDays(hoy, -3) });
+  docs.push({ id: "d-s2", clienteId: "c6", nombre: "Fotos del daño (4)", tipo: "Fotos", fecha: addDays(hoy, -3) });
+  return docs;
+}

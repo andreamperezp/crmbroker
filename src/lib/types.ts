@@ -23,6 +23,8 @@ export interface Cliente {
   asesorId: string;
   origen: Origen;
   desde: string; // fecha ISO de alta
+  /** Interacciones que registra el asesor (llamadas, visitas) */
+  notas?: { fecha: string; texto: string }[];
 }
 
 export const ETAPAS = ["Nueva", "Contactada", "Cotizada", "Negociación", "Ganada", "Perdida"] as const;
@@ -44,6 +46,8 @@ export interface Lead {
   origen: Origen;
   creado: string;
   notas: { fecha: string; texto: string }[];
+  /** Propuesta elegida o enviada: aseguradora, plan y precio mensual */
+  cotizacion?: { aseguradora: string; plan: string; precio: number };
 }
 
 export type EstadoPoliza = "Vigente" | "Por renovar" | "Vencida";
@@ -85,7 +89,24 @@ export interface Gestion {
   creada: string;
   vence: string; // tiempo de respuesta comprometido
   historial: { fecha: string; texto: string }[];
+  /** Checklist del trámite (ver CHECKLIST) */
+  checks: boolean[];
+  /** Quién lo tomó en administración */
+  responsable?: string;
+  rechazada?: boolean;
+  /** Siniestros: monto estimado y relato del asegurado */
+  monto?: number;
+  relato?: string;
 }
+
+/** Lo que hay que reunir en cada trámite antes de cerrarlo */
+export const CHECKLIST: Record<TipoGestion, string[]> = {
+  Emisión: ["DNI del titular", "Datos del riesgo verificados", "Inspección o fotos", "Medio de pago adherido"],
+  Endoso: ["Pedido del cliente", "Documentación del cambio", "Diferencia de prima calculada"],
+  Siniestro: ["Denuncia completa", "Fotos del daño", "Presupuesto o factura", "Datos del tercero, si lo hubo"],
+  Renovación: ["Suma asegurada actualizada", "Propuesta enviada", "Conformidad del cliente"],
+  Baja: ["Motivo registrado", "Alternativa ofrecida", "Pedido firmado"],
+};
 
 export type NivelMora = "temprana" | "tardia";
 
@@ -100,7 +121,35 @@ export interface Cuota {
   medio?: string;
   mora?: NivelMora; // la marca cobranzas cuando confirma el pase a mora
   promesa?: string;
+  /** Si la deuda se refinanció, el plan que la reemplaza */
+  planId?: string;
   historial: { fecha: string; texto: string }[];
+}
+
+export interface Mensaje {
+  id: string;
+  clienteId: string;
+  de: "cliente" | "asesor" | "cobranzas";
+  texto: string;
+  fecha: string;
+  hora: string;
+}
+
+export interface PlanPago {
+  id: string;
+  clienteId: string;
+  deuda: number;
+  recargo: number; // porcentaje
+  cuotas: { n: number; fecha: string; monto: number }[];
+  creado: string;
+}
+
+export interface Documento {
+  id: string;
+  clienteId: string;
+  nombre: string;
+  tipo: "Certificado" | "DNI" | "Cédula" | "Denuncia" | "Factura" | "Fotos" | "Póliza";
+  fecha: string;
 }
 
 export const TIPOS_TAREA = ["Bienvenida", "Control 30 días", "Renovación", "Post-siniestro", "Deuda", "Aniversario"] as const;
@@ -151,6 +200,11 @@ export interface Estado {
   tareas: Tarea[];
   prospectos: Prospecto[];
   eventos: Evento[];
+  mensajes: Mensaje[];
+  planes: PlanPago[];
+  documentos: Documento[];
   clienteActual: string | null;
+  /** Autogestión: ver como web o como celular */
+  movil: boolean;
   seq: number;
 }

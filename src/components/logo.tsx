@@ -1,20 +1,26 @@
-/** Marca de Brokerflow: dos trazos que fluyen, como un caso que pasa de mano en mano sin cortarse. */
-export function LogoMark({ size = 28 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
-      <rect width="32" height="32" rx="9" fill="var(--primary)" />
-      <path d="M7 19c3.5-6 7-6 9 0s5.5 6 9 0" fill="none" stroke="var(--flow)" strokeWidth="3" strokeLinecap="round" />
-      <path d="M7 13c3.5-6 7-6 9 0s5.5 6 9 0" fill="none" stroke="var(--on-primary)" strokeWidth="3" strokeLinecap="round" opacity=".9" />
-    </svg>
-  );
+/* eslint-disable @next/next/no-img-element */
+import { cx } from "./ui";
+
+/**
+ * Logo de BrokerFlow: la "B" que avanza (la imagen original) y el nombre en Figtree.
+ * Sobre fondos claros la imagen se integra con mix-blend-mode; sobre oscuro va en una placa blanca.
+ */
+export function LogoMark({ size = 32, onDark }: { size?: number; onDark?: boolean }) {
+  if (onDark)
+    return (
+      <span className="grid shrink-0 place-items-center rounded-[10px] bg-white" style={{ width: size + 8, height: size + 8 }}>
+        <img src="/brand/mark.png" alt="" width={size} height={size} className="logo-blend" style={{ width: size * 0.78, height: "auto" }} />
+      </span>
+    );
+  return <img src="/brand/mark.png" alt="" width={size} height={size} className="logo-blend shrink-0" style={{ width: size, height: "auto" }} />;
 }
 
-export function Logo({ size = 28 }: { size?: number }) {
+export function Logo({ size = 30, onDark, className }: { size?: number; onDark?: boolean; className?: string }) {
   return (
-    <span className="inline-flex items-center gap-2">
-      <LogoMark size={size} />
-      <span className="font-display text-lg font-bold tracking-tight">
-        broker<span className="text-flow">flow</span>
+    <span className={cx("inline-flex items-center gap-2.5", className)}>
+      <LogoMark size={size} onDark={onDark} />
+      <span className={cx("font-extrabold tracking-[-0.01em]", onDark ? "text-white" : "text-ink")} style={{ fontSize: size * 0.62 }}>
+        Broker<span className={onDark ? "text-primary-light" : "text-logo-blue"}>Flow</span>
       </span>
     </span>
   );
